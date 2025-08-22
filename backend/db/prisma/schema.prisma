@@ -1,0 +1,411 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model absensi_karyawan_khusus {
+  id           String       @id(map: "PK__absensi___3213E83FC752E763") @default(dbgenerated("newid()"), map: "DF__absensi_kary__id__2A164134") @db.UniqueIdentifier
+  id_karyawan  String       @db.UniqueIdentifier
+  tanggal      DateTime     @db.Date
+  status       String       @db.NVarChar(255)
+  keterangan   String?      @db.Text
+  create_at    DateTime     @default(now(), map: "DF__absensi_k__creat__2B0A656D") @db.DateTime
+  create_by    String       @db.NVarChar(255)
+  mst_karyawan mst_karyawan @relation(fields: [id_karyawan], references: [id], onUpdate: NoAction, map: "FK__absensi_k__id_ka__503BEA1C")
+
+  @@unique([id_karyawan, tanggal], map: "idx_absensi_karyawan_tanggal_unique")
+  @@index([id_karyawan], map: "idx_absensi_karyawan")
+  @@index([id_karyawan, status], map: "idx_absensi_karyawan_status")
+  @@index([status], map: "idx_absensi_status")
+  @@index([tanggal], map: "idx_absensi_tanggal")
+  @@index([tanggal, status], map: "idx_absensi_tanggal_status")
+}
+
+model kalender_kerja {
+  tanggal    DateTime @id(map: "PK__kalender__42891E558B8A79BF") @db.Date
+  is_libur   Boolean  @default(false, map: "DF__kalender___is_li__03F0984C")
+  keterangan String?  @db.Text
+  create_at  DateTime @default(now(), map: "DF__kalender___creat__04E4BC85") @db.DateTime
+
+  @@index([is_libur], map: "idx_kalender_libur")
+  @@index([tanggal, is_libur], map: "idx_kalender_tanggal_libur")
+}
+
+model mst_karyawan {
+  id                      String                    @id(map: "PK__mst_kary__3213E83F4C506214") @default(dbgenerated("newid()"), map: "DF__mst_karyawan__id__00200768") @db.UniqueIdentifier
+  nama                    String                    @db.NVarChar(255)
+  gaji_pokok              Decimal                   @db.Decimal(18, 0)
+  create_date             DateTime                  @default(now(), map: "DF__mst_karya__creat__01142BA1") @db.DateTime
+  create_by               String                    @db.NVarChar(255)
+  update_date             DateTime?                 @db.DateTime
+  update_by               String?                   @db.NVarChar(255)
+  absensi_karyawan_khusus absensi_karyawan_khusus[]
+  mst_operasional         mst_operasional[]
+  mst_produktivitas       mst_produktivitas[]
+  purchase_request        purchase_request[]
+  trs_transaksi_header    trs_transaksi_header[]
+
+  @@index([nama], map: "idx_karyawan_nama")
+}
+
+model mst_kategori {
+  id          String       @id(map: "PK__mst_kate__3213E83F7443CEDF") @default(dbgenerated("newid()"), map: "DF__mst_kategori__id__6C190EBB") @db.UniqueIdentifier
+  nama        String       @unique(map: "idx_kategori_nama") @db.NVarChar(255)
+  create_date DateTime     @default(now(), map: "DF__mst_kateg__creat__6D0D32F4") @db.DateTime
+  create_by   String       @db.NVarChar(255)
+  update_date DateTime?    @db.DateTime
+  update_by   String?      @db.NVarChar(255)
+  mst_produk  mst_produk[]
+}
+
+model mst_operasional {
+  id                     String            @id(map: "PK__mst_oper__3213E83F829A67BD") @default(dbgenerated("newid()"), map: "DF__mst_operasio__id__17F790F9") @db.UniqueIdentifier
+  id_karyawan            String            @db.UniqueIdentifier
+  keterangan_pengeluaran String            @db.Text
+  total_pengeluaran      Decimal           @db.Decimal(18, 0)
+  create_date            DateTime          @default(now(), map: "DF__mst_opera__creat__18EBB532") @db.DateTime
+  create_by              String            @db.NVarChar(255)
+  update_date            DateTime?         @db.DateTime
+  update_by              String?           @db.NVarChar(255)
+  mst_karyawan           mst_karyawan      @relation(fields: [id_karyawan], references: [id], onUpdate: NoAction, map: "FK__mst_opera__id_ka__489AC854")
+  trs_pengeluaran        trs_pengeluaran[]
+
+  @@index([create_date], map: "idx_operasional_create_date")
+  @@index([id_karyawan], map: "idx_operasional_karyawan")
+  @@index([id_karyawan, create_date], map: "idx_operasional_karyawan_date")
+}
+
+model mst_pelanggan {
+  id                   String                 @id(map: "PK__mst_pela__3213E83FB58D6AA6") @default(dbgenerated("newid()"), map: "DF__mst_pelangga__id__7C4F7684") @db.UniqueIdentifier
+  nama_pelanggan       String                 @db.NVarChar(255)
+  no_telepon           String                 @db.NVarChar(255)
+  plat_nomer           String?                @unique(map: "idx_pelanggan_plat") @db.NVarChar(255)
+  nomer_mesin          String?                @unique(map: "idx_pelanggan_mesin") @db.NVarChar(255)
+  nomer_rangka         String?                @unique(map: "idx_pelanggan_rangka") @db.NVarChar(255)
+  create_date          DateTime               @default(now(), map: "DF__mst_pelan__creat__7D439ABD") @db.DateTime
+  create_by            String                 @db.NVarChar(255)
+  update_date          DateTime?              @db.DateTime
+  update_by            String?                @db.NVarChar(255)
+  trs_transaksi_header trs_transaksi_header[]
+
+  @@index([nama_pelanggan], map: "idx_pelanggan_nama")
+  @@index([no_telepon], map: "idx_pelanggan_telepon")
+}
+
+model mst_permission {
+  id                  String                @id(map: "PK__mst_perm__3213E83F377242C2") @default(dbgenerated("newid()"), map: "DF__mst_permissi__id__6754599E") @db.UniqueIdentifier
+  nama                String                @unique(map: "idx_permission_nama") @db.NVarChar(255)
+  create_date         DateTime              @default(now(), map: "DF__mst_permi__creat__68487DD7") @db.DateTime
+  create_by           String                @db.NVarChar(255)
+  update_date         DateTime?             @db.DateTime
+  update_by           String?               @db.NVarChar(255)
+  mst_role_permission mst_role_permission[]
+}
+
+model mst_produk {
+  id                    String                  @id(map: "PK__mst_prod__3213E83FE807340C") @default(dbgenerated("newid()"), map: "DF__mst_produk__id__123EB7A3") @db.UniqueIdentifier
+  kode_produk           String                  @unique(map: "idx_produk_kode") @db.NVarChar(255)
+  nama_produk           String                  @db.NVarChar(255)
+  harga_jual            Decimal                 @db.Decimal(18, 0)
+  harga_beli            Decimal                 @db.Decimal(18, 0)
+  stock                 Int                     @default(0, map: "DF__mst_produ__stock__1332DBDC")
+  stock_minimal         Int                     @default(0, map: "DF__mst_produ__stock__14270015")
+  sumber_produk         String                  @db.NVarChar(255)
+  id_kategori           String                  @db.UniqueIdentifier
+  id_supplier           String                  @db.UniqueIdentifier
+  create_date           DateTime                @default(now(), map: "DF__mst_produ__creat__151B244E") @db.DateTime
+  create_by             String                  @db.NVarChar(255)
+  update_date           DateTime?               @db.DateTime
+  update_by             String?                 @db.NVarChar(255)
+  mst_kategori          mst_kategori            @relation(fields: [id_kategori], references: [id], onUpdate: NoAction, map: "FK__mst_produ__id_ka__46B27FE2")
+  mst_supplier          mst_supplier            @relation(fields: [id_supplier], references: [id], onUpdate: NoAction, map: "FK__mst_produ__id_su__47A6A41B")
+  purchase_order_item   purchase_order_item[]
+  purchase_request_item purchase_request_item[]
+  trs_transaksi_produk  trs_transaksi_produk[]
+
+  @@index([id_kategori], map: "idx_produk_kategori")
+  @@index([id_kategori, id_supplier], map: "idx_produk_kategori_supplier")
+  @@index([nama_produk], map: "idx_produk_nama")
+  @@index([stock], map: "idx_produk_stock")
+  @@index([stock, stock_minimal], map: "idx_produk_stock_monitoring")
+  @@index([id_supplier], map: "idx_produk_supplier")
+}
+
+model mst_produktivitas {
+  id                   String               @id(map: "PK__mst_prod__3213E83F2842CF0E") @default(dbgenerated("newid()"), map: "DF__mst_produkti__id__3C34F16F") @db.UniqueIdentifier
+  id_transaksi         String               @db.UniqueIdentifier
+  id_karyawan          String               @db.UniqueIdentifier
+  insentif_sparepart   Decimal              @default(0, map: "DF__mst_produ__insen__3D2915A8") @db.Decimal(18, 0)
+  insentif_jasa        Decimal              @default(0, map: "DF__mst_produ__insen__3E1D39E1") @db.Decimal(18, 0)
+  create_date          DateTime             @default(now(), map: "DF__mst_produ__creat__3F115E1A") @db.DateTime
+  create_by            String               @db.NVarChar(255)
+  update_date          DateTime?            @db.DateTime
+  update_by            String?              @db.NVarChar(255)
+  mst_karyawan         mst_karyawan         @relation(fields: [id_karyawan], references: [id], onUpdate: NoAction, map: "FK__mst_produ__id_ka__59C55456")
+  trs_transaksi_header trs_transaksi_header @relation(fields: [id_transaksi], references: [id], onUpdate: NoAction, map: "FK__mst_produ__id_tr__58D1301D")
+
+  @@index([create_date], map: "idx_produktivitas_create_date")
+  @@index([id_karyawan], map: "idx_produktivitas_karyawan")
+  @@index([id_karyawan, create_date], map: "idx_produktivitas_karyawan_date")
+  @@index([id_transaksi], map: "idx_produktivitas_transaksi")
+}
+
+model mst_role {
+  id                  String                @id(map: "PK__mst_role__3213E83FDD018477") @default(dbgenerated("newid()"), map: "DF__mst_role__id__628FA481") @db.UniqueIdentifier
+  nama                String                @unique(map: "idx_role_nama") @db.NVarChar(255)
+  create_date         DateTime              @default(now(), map: "DF__mst_role__create__6383C8BA") @db.DateTime
+  create_by           String                @db.NVarChar(255)
+  update_date         DateTime?             @db.DateTime
+  update_by           String?               @db.NVarChar(255)
+  mst_role_permission mst_role_permission[]
+  mst_user            mst_user[]
+}
+
+model mst_role_permission {
+  id             String         @id(map: "PK__mst_role__3213E83F8337AE33") @default(dbgenerated("newid()"), map: "DF__mst_role_per__id__0D7A0286") @db.UniqueIdentifier
+  id_role        String         @db.UniqueIdentifier
+  id_permission  String         @db.UniqueIdentifier
+  create_date    DateTime       @default(now(), map: "DF__mst_role___creat__0E6E26BF") @db.DateTime
+  create_by      String         @db.NVarChar(255)
+  update_date    DateTime?      @db.DateTime
+  update_by      String?        @db.NVarChar(255)
+  mst_permission mst_permission @relation(fields: [id_permission], references: [id], onUpdate: NoAction, map: "FK__mst_role___id_pe__45BE5BA9")
+  mst_role       mst_role       @relation(fields: [id_role], references: [id], onUpdate: NoAction, map: "FK__mst_role___id_ro__44CA3770")
+
+  @@unique([id_role, id_permission], map: "idx_role_permission_unique")
+  @@index([id_permission], map: "idx_role_permission_permission")
+  @@index([id_role], map: "idx_role_permission_role")
+}
+
+model mst_service {
+  id                    String                  @id(map: "PK__mst_serv__3213E83FBEA3D14D") @default(dbgenerated("newid()"), map: "DF__mst_service__id__75A278F5") @db.UniqueIdentifier
+  kode_service          String                  @unique(map: "idx_service_kode") @db.NVarChar(255)
+  nama_service          String                  @db.NVarChar(255)
+  deskripsi_service     String?                 @db.Text
+  harga_service         Decimal                 @db.Decimal(18, 0)
+  durasi_estimate       Int
+  create_date           DateTime                @default(now(), map: "DF__mst_servi__creat__76969D2E") @db.DateTime
+  create_by             String                  @db.NVarChar(255)
+  update_date           DateTime?               @db.DateTime
+  update_by             String?                 @db.NVarChar(255)
+  trs_transaksi_service trs_transaksi_service[]
+
+  @@index([harga_service], map: "idx_service_harga")
+  @@index([nama_service], map: "idx_service_nama")
+}
+
+model mst_supplier {
+  id             String           @id(map: "PK__mst_supp__3213E83FD55A1295") @default(dbgenerated("newid()"), map: "DF__mst_supplier__id__70DDC3D8") @db.UniqueIdentifier
+  nama_supplier  String           @db.NVarChar(255)
+  alamat         String           @db.Text
+  no_telepon     String           @db.NVarChar(255)
+  email          String?          @unique(map: "idx_supplier_email") @db.NVarChar(255)
+  create_date    DateTime         @default(now(), map: "DF__mst_suppl__creat__71D1E811") @db.DateTime
+  create_by      String           @db.NVarChar(255)
+  update_date    DateTime?        @db.DateTime
+  update_by      String?          @db.NVarChar(255)
+  mst_produk     mst_produk[]
+  purchase_order purchase_order[]
+
+  @@index([nama_supplier], map: "idx_supplier_nama")
+  @@index([no_telepon], map: "idx_supplier_telepon")
+}
+
+model mst_user {
+  id           String    @id(map: "PK__mst_user__3213E83F1B2EEE13") @default(dbgenerated("newid()"), map: "DF__mst_user__id__08B54D69") @db.UniqueIdentifier
+  id_role      String    @db.UniqueIdentifier
+  username     String    @unique(map: "idx_user_username") @db.NVarChar(255)
+  password     String    @db.NVarChar(255)
+  nama_lengkap String    @db.NVarChar(255)
+  active       Boolean   @default(true, map: "DF__mst_user__active__09A971A2")
+  create_date  DateTime  @default(now(), map: "DF__mst_user__create__0A9D95DB") @db.DateTime
+  create_by    String    @db.NVarChar(255)
+  update_date  DateTime? @db.DateTime
+  update_by    String?   @db.NVarChar(255)
+  mst_role     mst_role  @relation(fields: [id_role], references: [id], onUpdate: NoAction, map: "FK__mst_user__id_rol__43D61337")
+
+  @@index([active], map: "idx_user_active")
+  @@index([active, id_role], map: "idx_user_active_role")
+  @@index([id_role], map: "idx_user_role")
+}
+
+model purchase_order {
+  id                  String                @id(map: "PK__purchase__3213E83F6CA8AC88") @default(dbgenerated("newid()"), map: "DF__purchase_ord__id__2645B050") @db.UniqueIdentifier
+  order_date          DateTime              @db.DateTime
+  id_request          String                @db.UniqueIdentifier
+  id_supplier         String                @db.UniqueIdentifier
+  status              String                @db.NVarChar(255)
+  total_harga         Decimal               @db.Decimal(18, 0)
+  create_date         DateTime              @default(now(), map: "DF__purchase___creat__2739D489") @db.DateTime
+  create_by           String                @db.NVarChar(255)
+  update_date         DateTime?             @db.DateTime
+  update_by           String?               @db.NVarChar(255)
+  purchase_request    purchase_request      @relation(fields: [id_request], references: [id], onUpdate: NoAction, map: "FK__purchase___id_re__4E53A1AA")
+  mst_supplier        mst_supplier          @relation(fields: [id_supplier], references: [id], onUpdate: NoAction, map: "FK__purchase___id_su__4F47C5E3")
+  purchase_order_item purchase_order_item[]
+
+  @@index([order_date], map: "idx_purchase_order_date")
+  @@index([id_request], map: "idx_purchase_order_request")
+  @@index([status], map: "idx_purchase_order_status")
+  @@index([status, order_date], map: "idx_purchase_order_status_date")
+  @@index([id_supplier], map: "idx_purchase_order_supplier")
+  @@index([id_supplier, status], map: "idx_purchase_order_supplier_status")
+}
+
+model purchase_order_item {
+  id              String            @id(map: "PK__purchase__3213E83F9E398B9F") @default(dbgenerated("newid()"), map: "DF__purchase_ord__id__3587F3E0") @db.UniqueIdentifier
+  id_order        String            @db.UniqueIdentifier
+  id_produk       String            @db.UniqueIdentifier
+  jumlah          Int
+  harga_beli      Decimal           @db.Decimal(18, 0)
+  subtotal        Decimal           @db.Decimal(18, 0)
+  purchase_order  purchase_order    @relation(fields: [id_order], references: [id], onUpdate: NoAction, map: "FK__purchase___id_or__55009F39")
+  mst_produk      mst_produk        @relation(fields: [id_produk], references: [id], onUpdate: NoAction, map: "FK__purchase___id_pr__55F4C372")
+  trs_pengeluaran trs_pengeluaran[]
+
+  @@index([id_order, id_produk], map: "idx_purchase_order_item_composite")
+  @@index([id_order], map: "idx_purchase_order_item_order")
+  @@index([id_produk], map: "idx_purchase_order_item_produk")
+}
+
+model purchase_request {
+  id                    String                  @id(map: "PK__purchase__3213E83FE21944FA") @default(dbgenerated("newid()"), map: "DF__purchase_req__id__1BC821DD") @db.UniqueIdentifier
+  request_date          DateTime                @db.DateTime
+  requested_by          String                  @db.UniqueIdentifier
+  status                String                  @db.NVarChar(255)
+  notes                 String?                 @db.Text
+  create_date           DateTime                @default(now(), map: "DF__purchase___creat__1CBC4616") @db.DateTime
+  create_by             String                  @db.NVarChar(255)
+  update_date           DateTime?               @db.DateTime
+  update_by             String?                 @db.NVarChar(255)
+  purchase_order        purchase_order[]
+  mst_karyawan          mst_karyawan            @relation(fields: [requested_by], references: [id], onUpdate: NoAction, map: "FK__purchase___reque__498EEC8D")
+  purchase_request_item purchase_request_item[]
+
+  @@index([request_date], map: "idx_purchase_request_date")
+  @@index([requested_by], map: "idx_purchase_request_karyawan")
+  @@index([status], map: "idx_purchase_request_status")
+  @@index([status, request_date], map: "idx_purchase_request_status_date")
+}
+
+model purchase_request_item {
+  id               String           @id(map: "PK__purchase__3213E83F4E94C546") @default(dbgenerated("newid()"), map: "DF__purchase_req__id__236943A5") @db.UniqueIdentifier
+  id_request       String           @db.UniqueIdentifier
+  id_produk        String           @db.UniqueIdentifier
+  jumlah           Int
+  keterangan       String?          @db.Text
+  mst_produk       mst_produk       @relation(fields: [id_produk], references: [id], onUpdate: NoAction, map: "FK__purchase___id_pr__4D5F7D71")
+  purchase_request purchase_request @relation(fields: [id_request], references: [id], onUpdate: NoAction, map: "FK__purchase___id_re__4C6B5938")
+
+  @@index([id_request, id_produk], map: "idx_purchase_request_item_composite")
+  @@index([id_produk], map: "idx_purchase_request_item_produk")
+  @@index([id_request], map: "idx_purchase_request_item_request")
+}
+
+model trs_omset {
+  id                   String               @id(map: "PK__trs_omse__3213E83F7B9085BD") @default(dbgenerated("newid()"), map: "DF__trs_omset__id__41EDCAC5") @db.UniqueIdentifier
+  id_transaksi         String               @db.UniqueIdentifier
+  id_pengeluaran       String?              @db.UniqueIdentifier
+  total_omset_bersih   Decimal              @db.Decimal(18, 0)
+  total_penjualan      Decimal              @db.Decimal(18, 0)
+  total_pengeluaran    Decimal              @db.Decimal(18, 0)
+  periode              DateTime             @db.Date
+  create_date          DateTime             @default(now(), map: "DF__trs_omset__creat__42E1EEFE") @db.DateTime
+  create_by            String               @db.NVarChar(255)
+  update_date          DateTime?            @db.DateTime
+  update_by            String?              @db.NVarChar(255)
+  trs_pengeluaran      trs_pengeluaran?     @relation(fields: [id_pengeluaran], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK__trs_omset__id_pe__5BAD9CC8")
+  trs_transaksi_header trs_transaksi_header @relation(fields: [id_transaksi], references: [id], onUpdate: NoAction, map: "FK__trs_omset__id_tr__5AB9788F")
+
+  @@index([create_date], map: "idx_omset_create_date")
+  @@index([id_pengeluaran], map: "idx_omset_pengeluaran")
+  @@index([periode], map: "idx_omset_periode")
+  @@index([periode, total_omset_bersih], map: "idx_omset_periode_total")
+  @@index([id_transaksi], map: "idx_omset_transaksi")
+}
+
+model trs_pengeluaran {
+  id                  String               @id(map: "PK__trs_peng__3213E83F70ACC5B8") @default(dbgenerated("newid()"), map: "DF__trs_pengelua__id__3864608B") @db.UniqueIdentifier
+  id_order_item       String?              @db.UniqueIdentifier
+  id_operasional      String?              @db.UniqueIdentifier
+  create_date         DateTime             @default(now(), map: "DF__trs_penge__creat__395884C4") @db.DateTime
+  create_by           String               @db.NVarChar(255)
+  trs_omset           trs_omset[]
+  mst_operasional     mst_operasional?     @relation(fields: [id_operasional], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK__trs_penge__id_op__57DD0BE4")
+  purchase_order_item purchase_order_item? @relation(fields: [id_order_item], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK__trs_penge__id_or__56E8E7AB")
+
+  @@index([create_date], map: "idx_pengeluaran_create_date")
+  @@index([id_operasional], map: "idx_pengeluaran_operasional")
+  @@index([id_order_item], map: "idx_pengeluaran_order_item")
+}
+
+model trs_transaksi_header {
+  id                    String                  @id(map: "PK__trs_tran__3213E83F32496DA0") @default(dbgenerated("newid()"), map: "DF__trs_transaks__id__1F98B2C1") @db.UniqueIdentifier
+  id_pelanggan          String                  @db.UniqueIdentifier
+  id_karyawan           String                  @db.UniqueIdentifier
+  tipe_pembayaran       String                  @db.NVarChar(255)
+  status                String                  @db.NVarChar(255)
+  total_harga           Decimal                 @db.Decimal(18, 0)
+  estimasi_transaksi    DateTime                @db.DateTime
+  actual_transaksi      DateTime?               @db.DateTime
+  create_date           DateTime                @default(now(), map: "DF__trs_trans__creat__208CD6FA") @db.DateTime
+  create_by             String                  @db.NVarChar(255)
+  update_date           DateTime?               @db.DateTime
+  update_by             String?                 @db.NVarChar(255)
+  mst_produktivitas     mst_produktivitas[]
+  trs_omset             trs_omset[]
+  mst_karyawan          mst_karyawan            @relation(fields: [id_karyawan], references: [id], onUpdate: NoAction, map: "FK__trs_trans__id_ka__4B7734FF")
+  mst_pelanggan         mst_pelanggan           @relation(fields: [id_pelanggan], references: [id], onUpdate: NoAction, map: "FK__trs_trans__id_pe__4A8310C6")
+  trs_transaksi_produk  trs_transaksi_produk[]
+  trs_transaksi_service trs_transaksi_service[]
+
+  @@index([actual_transaksi], map: "idx_transaksi_actual")
+  @@index([create_date], map: "idx_transaksi_create_date")
+  @@index([create_date, status], map: "idx_transaksi_date_status")
+  @@index([estimasi_transaksi], map: "idx_transaksi_estimasi")
+  @@index([id_karyawan], map: "idx_transaksi_karyawan")
+  @@index([id_pelanggan], map: "idx_transaksi_pelanggan")
+  @@index([id_pelanggan, status], map: "idx_transaksi_pelanggan_status")
+  @@index([status], map: "idx_transaksi_status")
+  @@index([status, create_date], map: "idx_transaksi_status_date")
+}
+
+model trs_transaksi_produk {
+  id                   String               @id(map: "PK__trs_tran__3213E83F6627B0CA") @default(dbgenerated("newid()"), map: "DF__trs_transaks__id__2DE6D218") @db.UniqueIdentifier
+  id_transaksi         String               @db.UniqueIdentifier
+  id_produk            String               @db.UniqueIdentifier
+  jumlah_barang        Int
+  harga_produk         Decimal              @db.Decimal(18, 0)
+  create_date          DateTime             @default(now(), map: "DF__trs_trans__creat__2EDAF651") @db.DateTime
+  create_by            String               @db.NVarChar(255)
+  update_date          DateTime?            @db.DateTime
+  update_by            String?              @db.NVarChar(255)
+  mst_produk           mst_produk           @relation(fields: [id_produk], references: [id], onUpdate: NoAction, map: "FK__trs_trans__id_pr__5224328E")
+  trs_transaksi_header trs_transaksi_header @relation(fields: [id_transaksi], references: [id], onUpdate: NoAction, map: "FK__trs_trans__id_tr__51300E55")
+
+  @@index([id_transaksi, id_produk], map: "idx_transaksi_produk_composite")
+  @@index([id_produk], map: "idx_transaksi_produk_produk")
+  @@index([id_transaksi], map: "idx_transaksi_produk_transaksi")
+}
+
+model trs_transaksi_service {
+  id                   String               @id(map: "PK__trs_tran__3213E83F3B34E01D") @default(dbgenerated("newid()"), map: "DF__trs_transaks__id__31B762FC") @db.UniqueIdentifier
+  id_transaksi         String               @db.UniqueIdentifier
+  id_service           String               @db.UniqueIdentifier
+  harga_service        Decimal              @db.Decimal(18, 0)
+  deskripsi_service    String?              @db.Text
+  create_date          DateTime             @default(now(), map: "DF__trs_trans__creat__32AB8735") @db.DateTime
+  create_by            String               @db.NVarChar(255)
+  update_date          DateTime?            @db.DateTime
+  update_by            String?              @db.NVarChar(255)
+  mst_service          mst_service          @relation(fields: [id_service], references: [id], onUpdate: NoAction, map: "FK__trs_trans__id_se__540C7B00")
+  trs_transaksi_header trs_transaksi_header @relation(fields: [id_transaksi], references: [id], onUpdate: NoAction, map: "FK__trs_trans__id_tr__531856C7")
+
+  @@index([id_transaksi, id_service], map: "idx_transaksi_service_composite")
+  @@index([id_service], map: "idx_transaksi_service_service")
+  @@index([id_transaksi], map: "idx_transaksi_service_transaksi")
+}
