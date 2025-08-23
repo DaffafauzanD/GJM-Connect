@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "./Prisma.service";
-import { mst_user, Prisma } from "generated/prisma";
+import { PrismaService } from "./prisma.service";
+import {mst_user , Prisma } from "@prisma/client";
 
 @Injectable()
 export class UserService {
@@ -21,4 +21,5 @@ export class UserService {
   async deleteUser(id: string) {
     return this.prisma.mst_user.delete({ where: { id } });
   }
+
 }
