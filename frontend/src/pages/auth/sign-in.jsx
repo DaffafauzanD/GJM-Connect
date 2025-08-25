@@ -6,42 +6,88 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthService } from "@/core/application/services/auth.service";
+import { AuthRepository } from "@/core/infrastructure/repositories/auth.repositories";
 
+const authService = new AuthService(new AuthRepository());
 
 export function SignIn() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await authService.login({ username, password }); // pakai instance
+      navigate("/dashboard/home");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
-    <section className="m-8 flex gap-4">
+   <section className="m-8 flex gap-4">
       <div className="w-full lg:w-3/5 mt-24">
         <div className="text-center">
-          <Typography variant="h2" className="font-bold mb-4">Sign In</Typography>
-          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to Sign In.</Typography>
+          <Typography variant="h2" className="font-bold mb-4">
+            Sign In
+          </Typography>
+          <Typography
+            variant="paragraph"
+            color="blue-gray"
+            className="text-lg font-normal"
+          >
+            Enter your email and password to Sign In.
+          </Typography>
         </div>
-        <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
+
+        {/* Hanya 1 form */}
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2"
+        >
           <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
+            <Typography
+              variant="small"
+              color="blue-gray"
+              className="-mb-3 font-medium"
+            >
               Your email
             </Typography>
             <Input
               size="lg"
               placeholder="name@mail.com"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="!border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
                 className: "before:content-none after:content-none",
               }}
             />
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
+
+            <Typography
+              variant="small"
+              color="blue-gray"
+              className="-mb-3 font-medium"
+            >
               Password
             </Typography>
             <Input
               type="password"
               size="lg"
               placeholder="********"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="!border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
                 className: "before:content-none after:content-none",
               }}
             />
           </div>
+
           <Checkbox
             label={
               <Typography
@@ -60,7 +106,8 @@ export function SignIn() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6" fullWidth>
+
+          <Button type="submit" className="mt-6" fullWidth>
             Sign In
           </Button>
 
