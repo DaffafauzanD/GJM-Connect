@@ -1,4 +1,4 @@
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { RoleServiceInterface } from '../../domain/services/role-services.interfaces';
 import { RoleRepositoryInterface } from '../../domain/repositories/role-repositories.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -29,7 +29,7 @@ export class RoleService implements RoleServiceInterface {
   async createRole(role: CreateRoleDto): Promise<PaginatedResponse<RoleDto>> {
     const existingRole = await this.roleRepository.findRoleByName(role.nama);
     if (existingRole) {
-      throw new UnauthorizedException({
+      throw new ConflictException({
         message: 'Role already exists',
         errors: ['Duplicate role name'],
       });
