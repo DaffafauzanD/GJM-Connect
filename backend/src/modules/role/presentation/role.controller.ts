@@ -9,7 +9,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { RoleService } from '../application/services/role.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBadRequestResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBadRequestResponse, ApiUnauthorizedResponse, ApiConflictResponse } from '@nestjs/swagger';
 import { RoleDto } from 'src/modules/role/application/dto/role.dto';
 import { PaginationDto } from 'src/common/dto';
 import { CreateRoleDto } from '../application/dto/create-role.dto';
@@ -31,7 +31,7 @@ export class RoleController {
   }
 
   @Post()
-  @ApiUnauthorizedResponse({
+  @ApiConflictResponse({
   description: 'Role already exists or validation error',
   schema: {
     example: {
