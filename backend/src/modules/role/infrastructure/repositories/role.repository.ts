@@ -36,13 +36,21 @@ export class RoleRepository implements RoleRepositoryInterface {
         };
     }
 
-    async createRole(role: CreateRoleDto): Promise<RoleDto> {
+    async createRole(role: CreateRoleDto): Promise<PaginatedResponse<RoleDto>> {
         const createdRole = await this.prisma.mst_role.create({
             data: {
                 ...role,
             },
         });
-        return createdRole as RoleDto;
+        return {
+            data: [createdRole as RoleDto],
+            meta: {
+                page: 1,
+                limit: 1,
+                total: 1,
+                totalPages: 1,
+            },
+        };
     }
 
     async findRoleById(id: string): Promise<Role | null> {
