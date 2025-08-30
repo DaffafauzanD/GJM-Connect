@@ -2,9 +2,15 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthServiceInterface } from '../../domain/service/auth-service.interface';
 import { AuthRepositoryInterface } from '../../domain/repositories/auth-repositories.interface';
-import { LoginRequest, LoginResponse, JwtPayload } from '../../domain/entities/auth-entity';
+import {
+  LoginRequest,
+  LoginResponse,
+  JwtPayload,
+} from '../../domain/entities/auth-entity';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../../../prisma/prisma.service';
+
+import { environment } from 'src/config/environment.config';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
@@ -26,7 +32,10 @@ export class AuthService implements AuthServiceInterface {
     }
 
     // Validate password
-    const isPasswordValid = await this.authRepository.validatePassword(password, user.password);
+    const isPasswordValid = await this.authRepository.validatePassword(
+      password,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -36,7 +45,7 @@ export class AuthService implements AuthServiceInterface {
 
     const permissions = await this.getPermission(user.id_role);
 
-    const token_type = ["auth"]
+    const token_type = ['auth'];
     // Generate JWT token
     const payload: JwtPayload = {
       sub: user.id,
@@ -46,7 +55,10 @@ export class AuthService implements AuthServiceInterface {
       permission: permissions,
     };
 
-    const access_token = this.jwtService.sign(payload);
+    const access_token = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'), // <-- use string, not number
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
 
     return {
       access_token,
@@ -86,9 +98,9 @@ export class AuthService implements AuthServiceInterface {
           mst_permission: true,
         },
       });
-      return rolePermissions.map(rp => rp.mst_permission.nama);
+      return rolePermissions.map((rp) => rp.mst_permission.nama);
     } catch (error) {
       return [];
     }
   }
-} 
+}

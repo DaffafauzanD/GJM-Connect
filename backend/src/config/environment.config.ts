@@ -5,7 +5,7 @@ export const environment = {
     url: process.env.DATABASE_URL || 'sqlserver://localhost:1433;initial catalog=GJM;user=LocalAuth;password=local123;encrypt=true;trustServerCertificate=true;',
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
+    secret: process.env.JWT_SECRET || 'qpwoeip1o23i-widapsoxjlkadalskd9u123k5;elfsskx;vjpoekqwlasjdhKLAJDOIJa',
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
   cors: {
