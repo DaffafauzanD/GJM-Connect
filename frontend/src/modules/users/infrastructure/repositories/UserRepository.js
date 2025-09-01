@@ -20,4 +20,11 @@ export class UserRepository extends IUserRepository {
       user,
     };
   }
+
+  async logout() {
+    const response = await logoutUser();
+    if (!response || !response.success) {
+      throw new Error("Logout failed: Invalid response from server.");
+    }
+  }
 }

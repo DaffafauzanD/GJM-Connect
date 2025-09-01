@@ -13,3 +13,17 @@ export async function loginUser({ username, password }) {
   );
   return response.data;
 }
+
+export async function logoutUser() {
+  const response = await axios.post(
+    "/api/v1/auth/logout",
+    {},
+    {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+}
