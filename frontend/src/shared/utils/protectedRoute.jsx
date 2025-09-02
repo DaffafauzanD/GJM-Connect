@@ -1,29 +1,30 @@
 import { Navigate } from "react-router-dom";
-import { storageUtils } from "@/shared/utils/storage.utils"; // Import the object
 import { useEffect, useState } from "react";
+import { AuthService } from "@/core/application/services/auth.service";
+import { AuthRepository } from "@/core/infrastructure/repositories/auth.repositories";
+
+const authService = new AuthService(new AuthRepository());
 
 export function ProtectedRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const token = storageUtils.getAccessToken();
-      setIsAuthenticated(!!token);
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-      setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
-    }
+    const checkAuth = async () => {
+      try {
+        const isAuth = await authService.isAuthenticated(); // pakai await
+        setIsAuthenticated(isAuth);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/sign-in" replace />;
+  if (isAuthenticated === null) {
+    return <div>Loading...</div>; // sementara loading
   }
 
   return children;

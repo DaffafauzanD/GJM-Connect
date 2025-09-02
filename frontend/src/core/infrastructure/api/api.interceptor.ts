@@ -1,68 +1,46 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { API_CONFIG } from './api.config';
-import { storageUtils } from '@/shared/utils/storage.utils';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import { API_CONFIG } from "./api.config";
 
 class ApiInterceptor {
-    private api: AxiosInstance;
+  private api: AxiosInstance;
 
-    constructor() {
-        this.api = axios.create({
-            baseURL: API_CONFIG.BASE_URL,
-            timeout: API_CONFIG.TIMEOUT,
-            withCredentials: true,
-        });
+  constructor() {
+    this.api = axios.create({
+      baseURL: API_CONFIG.BASE_URL,
+      timeout: API_CONFIG.TIMEOUT,
+      withCredentials: true,
+    });
 
-        this.setupInterceptors();
-    }
+    this.setupInterceptors();
+  }
 
-    private setupInterceptors(): void {
-        this.api.interceptors.request.use(
-            (config) => {
-                const token = storageUtils.getAccessToken();
-                if (token) {
-                    config.headers.Authorization = `Bearer ${token}`
-                }
-                return config;
-            },
-            (error) => Promise.reject(error)
-        );
+  private setupInterceptors(): void {
+    this.api.interceptors.request.use(
+      (config) => {
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-        this.api.interceptors.response.use(
-            (response: AxiosResponse) => response,
-            async (error: AxiosError) => {
-                const originalRequest = error.config as any;
+    this.api.interceptors.response.use(
+      (response: AxiosResponse) => {
+        return response;
+      },
+      async (error: AxiosError) => {
+        if (error.response?.status === 401) {
+          console.warn("Unauthorized, redirecting to login...");
+          window.location.href = "/auth/sign-in";
+        }
 
-                if (error.response?.status === 401 && !originalRequest._retry){
-                    originalRequest._retry = true;
+        return Promise.reject(error);
+      }
+    );
+  }
 
-                    try{
-                        const refreshToken = storageUtils.getRefreshToken();
-                        if (refreshToken) {
-                            const response = await this.api.post('/auth/refresh', {
-                                refreshToken,
-                              });
-
-                              const { accessToken } = response.data;
-                              storageUtils.setAccessToken(accessToken);
-
-                              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                              return this.api(originalRequest);
-                        }
-                    }catch (refreshError) {
-                        storageUtils.clearTokens();
-                        window.location.href = '/auth/login';
-                        return Promise.reject(refreshError);
-                    }
-                }
-
-                return Promise.reject(error);
-            }
-        );
-    }
-
-    public geInstance(): AxiosInstance {
-        return this.api;
-    }
+  public getInstance(): AxiosInstance {
+    return this.api;
+  }
 }
 
 export const apiInterceptor = new ApiInterceptor();
+export const apiService = apiInterceptor.getInstance();

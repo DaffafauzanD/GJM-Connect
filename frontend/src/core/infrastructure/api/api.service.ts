@@ -7,7 +7,7 @@ export class ApiService {
     private api: AxiosInstance;
 
     constructor() {
-        this.api = apiInterceptor.geInstance();
+        this.api = apiInterceptor.getInstance();
     }
 
     async get<T = any>(endpoint: string, config?: Partial<ApiRequestConfig>): Promise<ApiResponse<T>> {

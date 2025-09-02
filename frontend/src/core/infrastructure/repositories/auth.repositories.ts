@@ -6,7 +6,11 @@ import { API_ENDPOINTS, API_CONFIG } from '@/core/infrastructure/api/api.config'
 export class AuthRepository implements IAuthRepository {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await apiService.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, credentials);
-    console.log(response);
+    return response.data!;
+  }
+
+  async authMe(): Promise<any> {
+    const response = await apiService.get(API_ENDPOINTS.AUTH.ME);
     return response.data!;
   }
 
@@ -21,11 +25,6 @@ export class AuthRepository implements IAuthRepository {
 
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
     const response = await apiService.post<AuthResponse>(API_ENDPOINTS.AUTH.REFRESH, { refreshToken });
-    return response.data!;
-  }
-
-  async getCurrentUser(): Promise<User> {
-    const response = await apiService.get<User>(API_ENDPOINTS.AUTH.ME);
     return response.data!;
   }
 

@@ -14,7 +14,7 @@ export const API_ENDPOINTS = {
       REGISTER: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}/auth/register`,
       LOGOUT: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}/auth/logout`,
       REFRESH: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}/auth/refresh`,
-      ME: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}/auth/me`,
+      ME: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}/auth/profile`,
       FORGOT_PASSWORD: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}/auth/forgot-password`,
       RESET_PASSWORD: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION }/auth/reset-password`,
     },
