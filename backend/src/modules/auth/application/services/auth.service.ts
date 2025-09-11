@@ -25,7 +25,6 @@ export class AuthService implements AuthServiceInterface {
   async login(loginRequest: LoginRequest): Promise<LoginResponse> {
     const { username, password } = loginRequest;
 
-    // Find user by username
     const user = await this.authRepository.findByUsername(username);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -40,7 +39,6 @@ export class AuthService implements AuthServiceInterface {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Get role name from database
     const role = await this.getRoleName(user.id_role);
 
     const permissions = await this.getPermission(user.id_role);

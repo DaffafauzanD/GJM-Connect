@@ -43,8 +43,8 @@ export class AuthController {
 
     // Set JWT token in cookie
     const cookieOptions = {
-      httpOnly: process.env.NODE_ENV === 'production', // false in development
-      secure: process.env.NODE_ENV === 'production', // false in development
+      httpOnly: true,
+      secure: true,
       sameSite: (process.env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       path: '/', // Ensure cookie is available for all paths
@@ -52,16 +52,14 @@ export class AuthController {
     
     response.cookie('access_token', result.access_token, cookieOptions);
 
-    // Also set a non-httpOnly cookie for development debugging
-    if (process.env.NODE_ENV !== 'production') {
-      response.cookie('access_token_debug', result.access_token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000,
-        path: '/',
-      });
-    }
+   // Set JWT token in cookie
+    // const cookieOptions = {
+    //   httpOnly: process.env.NODE_ENV === 'production', // false in development
+    //   secure: process.env.NODE_ENV === 'production', // false in development
+    //   sameSite: (process.env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
+    //   maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    //   path: '/', // Ensure cookie is available for all paths
+    // };
 
     return result;
   }
