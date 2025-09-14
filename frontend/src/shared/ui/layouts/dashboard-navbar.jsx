@@ -26,11 +26,24 @@ import {
   setOpenSidenav,
 } from "@/shared/application/context";
 
+import { useAuth } from "@/shared/application/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const {logout, loading} = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const res = await logout();
+    if (res?.success) {
+      navigate("/auth/sign-in", { replace: true });
+    }
+  };
 
   return (
     <Navbar
@@ -100,6 +113,22 @@ export function DashboardNavbar() {
               <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
             </IconButton>
           </Link>
+          
+           <Button
+              variant="text"
+              color="blue-gray"
+              className="hidden items-center gap-1 px-4 xl:flex normal-case"
+            >
+              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+              <span onClick={handleLogout}>{loading ? "Loading..." : "Sign out"}</span>
+            </Button>
+            <IconButton
+              variant="text"
+              color="blue-gray"
+              className="grid xl:hidden"
+            >
+              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+            </IconButton>
           <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
