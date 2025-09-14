@@ -7,6 +7,7 @@ import {
   UseGuards,
   Get,
   Req,
+  NotFoundException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
@@ -42,8 +43,8 @@ export class AuthController {
 
     // Set JWT token in cookie
     const cookieOptions = {
-      httpOnly: process.env.NODE_ENV === 'production', // false in development
-      secure: process.env.NODE_ENV === 'production', // false in development
+      httpOnly: true,
+      secure: true,
       sameSite: (process.env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       path: '/', // Ensure cookie is available for all paths
@@ -51,16 +52,14 @@ export class AuthController {
     
     response.cookie('access_token', result.access_token, cookieOptions);
 
-    // Also set a non-httpOnly cookie for development debugging
-    if (process.env.NODE_ENV !== 'production') {
-      response.cookie('access_token_debug', result.access_token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000,
-        path: '/',
-      });
-    }
+   // Set JWT token in cookie
+    // const cookieOptions = {
+    //   httpOnly: process.env.NODE_ENV === 'production', // false in development
+    //   secure: process.env.NODE_ENV === 'production', // false in development
+    //   sameSite: (process.env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
+    //   maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    //   path: '/', // Ensure cookie is available for all paths
+    // };
 
     return result;
   }
@@ -167,6 +166,9 @@ export class AuthController {
   async loginForSwagger(
     @Body() loginDto: LoginDto,
   ): Promise<LoginResponseDto> {
+     if (process.env.NODE_ENV === 'production') {
+      throw new NotFoundException('This endpoint is not available in production.');
+    }
     const result = await this.authService.login(loginDto);
     
     // Return token in response body for Swagger to use
