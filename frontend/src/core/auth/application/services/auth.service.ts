@@ -1,6 +1,6 @@
-import { IAuthService } from '@/core/domain/services/auth.service.interface';
-import { IAuthRepository } from '@/core/domain/repositories/auth.repository.interface';
-import { LoginCredentials, RegisterCredentials, AuthResponse, User, LoginResponse } from '@/core/domain/entities';
+import { IAuthService } from '../../domain/services/auth.service.interface';
+import { IAuthRepository } from '../../domain/repositories/auth.repository.interface';
+import { LoginCredentials, AuthResponse } from '../../domain/entities';
 
 export class AuthService implements IAuthService {
   constructor(private authRepository: IAuthRepository) {}

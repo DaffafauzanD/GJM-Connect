@@ -4,16 +4,15 @@ import { User } from "@/modules/users/domain/entities/user";
 
 export class UserRepository extends IUserRepository {
   async login({ username, password }) {
-    const response = await loginUser({ username, password });
+    const body = await loginUser({ username, password });
 
-    // The fix is here: check for response.data.user
-    if (!response || !response.data || !response.data.user) {
+    // Expecting direct body: { user, access_token }
+    if (!body || !body.user || !body.access_token) {
       throw new Error("Login failed: Invalid response from server.");
     }
 
-    // Get the user and token from response.data
-    const user = new User(response.data.user);
-    const accessToken = response.data.access_token;
+    const user = new User(body.user);
+    const accessToken = body.access_token;
 
     return {
       access_token: accessToken,
