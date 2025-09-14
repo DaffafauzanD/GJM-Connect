@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import { apiInterceptor } from "./api.interceptor";
 import { ApiRequestConfig, UploadConfig } from "./api.types";
-import { ApiResponse, ApiError } from "@/core/domain/entities";
+import { ApiResponse, ApiError } from "../../domain/entities";
 
 export class ApiService {
     private api: AxiosInstance;

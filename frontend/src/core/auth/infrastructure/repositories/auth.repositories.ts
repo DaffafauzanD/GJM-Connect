@@ -1,7 +1,7 @@
-import { IAuthRepository } from '@/core/domain/repositories/auth.repository.interface';
-import { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/core/domain/entities';
-import { apiService } from '@/core/infrastructure/api/api.service';
-import { API_ENDPOINTS, API_CONFIG } from '@/core/infrastructure/api/api.config';
+import { IAuthRepository } from '../../domain/repositories/auth.repository.interface';
+import { LoginCredentials, RegisterCredentials, AuthResponse } from '../../domain/entities';
+import { apiService } from '../../infrastructure/api/api.service';
+import { API_ENDPOINTS } from '../../infrastructure/api/api.config';
 
 export class AuthRepository implements IAuthRepository {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
