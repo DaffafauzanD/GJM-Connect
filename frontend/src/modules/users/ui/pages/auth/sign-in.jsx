@@ -10,7 +10,6 @@ import React, { useState } from "react";
 import { useAuth } from "@/shared/application/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const authService = new AuthService(new AuthRepository());
 
 export function SignIn() {
   const { login, loading, error, user } = useAuth();
