@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import { useAuth } from "@/shared/application/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { notifyError, notifySuccess } from "@/shared/ui/widgets/notifications/notificationBus";
 
 
 export function SignIn() {
@@ -24,10 +25,13 @@ export function SignIn() {
     e.preventDefault();
     const result = await login(form);
     console.log("Login result:", result);
-    if (result && result.success) {
+   if (result && result.success) {
+      notifySuccess("Signed in successfully");
       navigate("/dashboard/home");
+    } else {
+      const msg = result?.error || "Invalid username or password.";
+      notifyError(msg);
     }
-    // Optionally: redirect on success
   };
   return (
    <section className="m-8 flex gap-4">
