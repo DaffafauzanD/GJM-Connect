@@ -17,21 +17,21 @@ class ApiInterceptor {
   private setupInterceptors(): void {
     this.api.interceptors.request.use(
       (config) => {
+        // attach headers here if needed
         return config;
       },
       (error) => Promise.reject(error)
     );
 
     this.api.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response;
-      },
+      (response: AxiosResponse) => response,
       async (error: AxiosError) => {
         if (error.response?.status === 401) {
-          console.warn("Unauthorized, redirecting to login...");
-          window.location.href = "/auth/sign-in";
+          // optional: clear app state here
+          if (window.location.pathname !== "/auth/sign-in") {
+            window.location.href = "/auth/sign-in";
+          }
         }
-
         return Promise.reject(error);
       }
     );
@@ -43,4 +43,4 @@ class ApiInterceptor {
 }
 
 export const apiInterceptor = new ApiInterceptor();
-export const apiService = apiInterceptor.getInstance();
+// NOTE: do NOT export an apiService from here; use ApiService (api.service.ts) everywhere else

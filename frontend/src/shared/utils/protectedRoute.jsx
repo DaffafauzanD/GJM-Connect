@@ -1,31 +1,32 @@
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { AuthService } from "@/core/application/services/auth.service";
-import { AuthRepository } from "@/core/infrastructure/repositories/auth.repositories";
+import { AuthService } from "@/core/auth/application/services/auth.service";
+import { AuthRepository } from "@/core/auth/infrastructure/repositories/auth.repositories";
 
 const authService = new AuthService(new AuthRepository());
 
 export function ProtectedRoute({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    let mounted = true;
+    (async () => {
       try {
-        const isAuth = await authService.isAuthenticated(); // pakai await
-        setIsAuthenticated(isAuth);
-      } catch (error) {
-        console.error("Error checking authentication:", error);
-        setIsAuthenticated(false);
+        const isOk = await authService.isAuthenticated();
+        if (mounted) setOk(isOk);
+      } catch {
+        if (mounted) setOk(false);
+      } finally {
+        if (mounted) setLoading(false);
       }
+    })();
+    return () => {
+      mounted = false;
     };
-
-    checkAuth();
   }, []);
 
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>; // sementara loading
-  }
-
+  if (loading) return null; // or a small spinner
+  if (!ok) return <Navigate to="/auth/sign-in" replace />;
   return children;
 }
