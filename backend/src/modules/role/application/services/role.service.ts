@@ -26,7 +26,7 @@ export class RoleService implements RoleServiceInterface {
     return this.roleRepository.findRoleByName(name);
   }
 
-  async createRole(role: CreateRoleDto): Promise<PaginatedResponse<RoleDto>> {
+  async createRole(role: CreateRoleDto): Promise<RoleDto> {
     const existingRole = await this.roleRepository.findRoleByName(role.nama);
     if (existingRole) {
       throw new ConflictException({
