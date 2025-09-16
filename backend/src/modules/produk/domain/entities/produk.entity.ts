@@ -1,11 +1,14 @@
+import { Decimal } from "generated/prisma/runtime/library";
+
 export class Produk {
     id!: string;
     kode_produk!: string;
     nama_produk!: string;
     harga_jual!: number;
     harga_beli!: number;
-    stok!: number;
-    stok_minimal!: number;
+    stock!: number;
+    stock_minimal!: number;
+    sumber_produk!: string;
     id_kategori!: string;
     id_supplier!: string;
     create_date!: Date;

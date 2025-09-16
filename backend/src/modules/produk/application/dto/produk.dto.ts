@@ -1,6 +1,7 @@
-import { IsOptional, IsPositive, Min, IsString, IsIn, isString } from 'class-validator';
+import { IsOptional, IsPositive, Min, IsString, IsIn, isString, IsInt } from 'class-validator';
 import { Type } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger';
+import { Decimal } from '@prisma/client/runtime/library';
 
 
 export class ProdukDto {
@@ -14,25 +15,31 @@ export class ProdukDto {
     @ApiProperty({ example: 'Produk A' })
     nama_produk!: string;
 
-    @IsPositive()
-    @Min(0)
-    @ApiProperty({ example: 10000 })
-    harga_jual!: number;
+   @IsPositive()
+   @Min(0)
+   @ApiProperty({ example: 10000 })
+   @Type(() => Number)
+   harga_jual!: number;
 
-    @IsPositive()
-    @Min(0)
-    @ApiProperty({ example: 8000 })
-    harga_beli!: number;
+   @IsPositive()
+   @Min(0)
+   @ApiProperty({ example: 8000 })
+   @Type(() => Number)
+   harga_beli!: number;
 
-    @IsPositive()
+   @IsPositive()
+    @IsInt()
     @Min(0)
     @ApiProperty({ example: 50 })
-    stok!: number;
-
+    stock!: number;
+  
     @IsPositive()
+    @IsInt()
     @Min(0)
-    @ApiProperty({ example: 50 })
-    stok_minimal!: number;
+    @ApiProperty({ example: 10 })
+    stock_minimal!: number;
+    @IsString()
+    sumber_produk!: string;
 
     @IsString()
     id_kategori!: string;
@@ -55,5 +62,4 @@ export class ProdukDto {
     @IsOptional()
     @IsString()
     update_by?: string | null;
-
 }
