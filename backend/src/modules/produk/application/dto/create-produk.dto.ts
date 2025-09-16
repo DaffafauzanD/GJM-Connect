@@ -42,9 +42,11 @@ export class CreateProdukDto {
   sumber_produk!: string;
 
   @IsString()
+  @ApiProperty({ example: "8A2C9B4D-0E7F-4A6B-8D5C-3F1E7B9A4D6C" })
   id_kategori!: string;
 
   @IsString()
+  @ApiProperty({ example: "A1B2C3D4-E5F6-4789-A1B2-C3D4E5F67890" })
   id_supplier!: string;
 
   @Type(() => Date)
