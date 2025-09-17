@@ -68,17 +68,11 @@ export class ProdukRepository implements ProdukRepositoryInterface {
     // Map the result to the Produk entity, including all required fields
     return {
       ...created,
-            nama_produk: produk.nama_produk,
-            kode_produk: produk.kode_produk,
-            harga_jual: produk.harga_jual,
-            harga_beli: produk.harga_beli,
-            stock: produk.stock,
-            stock_minimal: produk.stock_minimal,
-            sumber_produk: produk.sumber_produk,
-            id_kategori: produk.id_kategori,
-            id_supplier: produk.id_supplier,
-            create_date: produk.create_date,
-            create_by: produk.create_by,
+      stok: created.stock,
+      stok_minimal: created.stock_minimal,
+      sumber_stok: created.sumber_produk,
+      harga_jual: created.harga_jual?.toNumber?.() ?? created.harga_jual,
+      harga_beli: created.harga_beli?.toNumber?.() ?? created.harga_beli,
     } as Produk;
   }
   
