@@ -7,6 +7,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RoleModule } from './modules/role/role.module';
 import { RoleController } from './modules/role/presentation/role.controller';
 import { HealthController } from './modules/health/health.controller';
+import { ProdukController } from './modules/produk/presentation/produk.controller';
+import { ProdukModule } from './modules/produk/produk.module';
 
 @Module({
   imports: [
@@ -16,8 +18,9 @@ import { HealthController } from './modules/health/health.controller';
     // UsersModule,
     AuthModule,
     RoleModule,
+    ProdukModule,
   ],
-  controllers: [AppController, HealthController, RoleController],
+  controllers: [AppController, HealthController, RoleController, ProdukController],
   providers: [AppService],
 })
 export class AppModule {}
