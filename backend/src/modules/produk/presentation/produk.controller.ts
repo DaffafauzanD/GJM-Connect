@@ -16,8 +16,8 @@ import { PaginationDto } from 'src/common/dto';
 import { CreateProdukDto } from '../application/dto/create-produk.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
-@ApiTags('Produks')
-@Controller('produks')
+@ApiTags('Products')
+@Controller('Products')
 export class ProdukController {
   constructor(private readonly produkService: ProdukService) {}
     @UseGuards(JwtAuthGuard)
